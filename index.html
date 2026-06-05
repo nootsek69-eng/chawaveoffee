@@ -811,12 +811,12 @@
                 // Out of range
                 document.getElementById('no-delivery-dist').innerText = `ระยะทางของคุณ: ${distFormatted} กม. (เกิน 7 กม.)`;
                 noDeliveryEl.classList.add('show');
-                currentResultText = `location ร้าน Chawave Coffee and Tea ${STORE_LAT}, ${STORE_LNG}\nระยะทาง: ${distFormatted} กิโลเมตร\nค่าจัดส่ง: ไม่รับจัดส่ง (เกินพื้นที่)`;
+                currentResultText = `📍 location ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\nระยะทาง: ${distFormatted} กิโลเมตร\nค่าจัดส่ง: ไม่รับจัดส่ง (เกินพื้นที่)`;
             } else {
                 document.getElementById('res-distance').innerText = `${distFormatted} กม.`;
                 document.getElementById('res-fee').innerText = `${tier.fee > 0 ? tier.fee + ' บาท' : 'ส่งฟรี! 🎉'}`;
                 resultsEl.classList.add('show');
-                currentResultText = `location ร้าน Chawave Coffee and Tea ${STORE_LAT}, ${STORE_LNG}\nระยะทาง: ${distFormatted} กิโลเมตร\nค่าจัดส่ง: ${tier.fee > 0 ? tier.fee + ' บาท' : 'ฟรี'}`;
+                currentResultText = `📍 location ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\nระยะทาง: ${distFormatted} กิโลเมตร\nค่าจัดส่ง: ${tier.fee > 0 ? tier.fee + ' บาท' : 'ฟรี'}`;
             }
         }
 
