@@ -296,10 +296,16 @@
         }
 
         .map-container {
-            height: 280px;
+            height: 420px;
             width: 100%;
             position: relative;
             z-index: 1;
+        }
+
+        @media (max-height: 700px) {
+            .map-container {
+                height: 300px;
+            }
         }
 
         .actions {
