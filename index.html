@@ -175,6 +175,98 @@
             display: none;
         }
 
+        .no-delivery {
+            background: #fff3f3;
+            border: 1px solid #ffcdd2;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            display: none;
+        }
+
+        .no-delivery.show {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .no-delivery .no-delivery-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .no-delivery p {
+            color: #c62828;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .no-delivery span {
+            color: #b71c1c;
+            font-size: 0.85rem;
+        }
+
+        .fee-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            margin-top: 0.5rem;
+        }
+
+        .fee-table th {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .fee-table th:last-child {
+            text-align: right;
+        }
+
+        .fee-table td {
+            padding: 0.45rem 0.75rem;
+            border-bottom: 1px solid var(--accent);
+            color: var(--text-main);
+        }
+
+        .fee-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        .fee-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .fee-table tr:last-child td:last-child {
+            color: #d32f2f;
+        }
+
+        .fee-table tr.active-tier td {
+            background: rgba(56, 142, 60, 0.1);
+            font-weight: 600;
+        }
+
+        .fee-table tr.active-tier td:last-child {
+            color: var(--success);
+        }
+
+        .table-section {
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .table-section .table-title {
+            font-size: 0.82rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         .results.show {
             display: block;
             animation: fadeIn 0.4s ease;
@@ -302,7 +394,34 @@
                     <i class="fa-regular fa-copy"></i> คัดลอกผลลัพธ์
                 </button>
             </div>
+
+            <div id="no-delivery" class="no-delivery">
+                <div class="no-delivery-icon">🛵❌</div>
+                <p>ระยะทางเกินพื้นที่จัดส่ง</p>
+                <span id="no-delivery-dist"></span><br>
+                <span style="font-size:0.8rem; color:#795548; margin-top:4px; display:block;">กรุณาติดต่อร้านเพื่อปรับราคาตามระยะทาง</span>
+            </div>
         </div>
+    </div>
+
+    <div class="table-section">
+        <p class="table-title"><i class="fa-solid fa-table"></i> ตารางค่าจัดส่ง</p>
+        <table class="fee-table" id="fee-table">
+            <thead>
+                <tr>
+                    <th>ระยะทาง</th>
+                    <th>ค่าจัดส่ง</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-tier="0"><td>0 – 1 กม.</td><td>ส่งฟรี 🎉</td></tr>
+                <tr data-tier="1"><td>1 – 2 กม.</td><td>15 บาท</td></tr>
+                <tr data-tier="2"><td>2 – 3 กม.</td><td>20 บาท</td></tr>
+                <tr data-tier="3"><td>3 – 5 กม.</td><td>30 บาท</td></tr>
+                <tr data-tier="4"><td>5 – 7 กม.</td><td>45 บาท</td></tr>
+                <tr data-tier="5"><td>เกิน 7 กม.</td><td>ไม่รับจัดส่ง ❌</td></tr>
+            </tbody>
+        </table>
     </div>
     
     <div id="toast" class="toast"><i class="fa-solid fa-check-circle"></i> คัดลอกผลลัพธ์สำเร็จ</div>
@@ -312,8 +431,20 @@
     <script>
         const STORE_LAT = 14.658529359926023;
         const STORE_LNG = 104.22206111928476;
-        const FREE_DISTANCE_KM = 1;
-        const RATE_PER_KM = 7;
+
+        // Tier-based delivery pricing
+        const DELIVERY_TIERS = [
+            { maxKm: 1,   fee: 0,    tierIndex: 0 },  // 0-1 km: Free
+            { maxKm: 2,   fee: 15,   tierIndex: 1 },  // 1-2 km: 15 บาท
+            { maxKm: 3,   fee: 20,   tierIndex: 2 },  // 2-3 km: 20 บาท
+            { maxKm: 5,   fee: 30,   tierIndex: 3 },  // 3-5 km: 30 บาท
+            { maxKm: 7,   fee: 45,   tierIndex: 4 },  // 5-7 km: 45 บาท
+            { maxKm: Infinity, fee: null, tierIndex: 5 } // 7+ km: ไม่รับจัดส่ง
+        ];
+
+        function getDeliveryTier(distanceKm) {
+            return DELIVERY_TIERS.find(tier => distanceKm <= tier.maxKm);
+        }
 
         let map, storeMarker, destMarker, routeLine;
         let currentResultText = '';
@@ -410,21 +541,38 @@
             }
         }
 
-        function displayResults(distanceKm, destLat, destLng) {
-            let fee = 0;
-            if (distanceKm > FREE_DISTANCE_KM) {
-                fee = distanceKm * RATE_PER_KM;
-            }
-            fee = Math.ceil(fee); // Round up to nearest integer
+        function highlightTier(tierIndex) {
+            document.querySelectorAll('#fee-table tbody tr').forEach(row => {
+                row.classList.remove('active-tier');
+            });
+            const activeRow = document.querySelector(`#fee-table tbody tr[data-tier="${tierIndex}"]`);
+            if (activeRow) activeRow.classList.add('active-tier');
+        }
 
+        function displayResults(distanceKm, destLat, destLng) {
             const distFormatted = distanceKm.toFixed(2);
-            document.getElementById('res-distance').innerText = `${distFormatted} กม.`;
-            document.getElementById('res-fee').innerText = `${fee > 0 ? fee + ' บาท' : 'ส่งฟรี!'}`;
-            
-            document.getElementById('results').classList.add('show');
-            
-            // Format output exactly as requested
-            currentResultText = `location ร้าน Chawave Coffee and Tea ${STORE_LAT}, ${STORE_LNG}\nระยะทาง: ${distFormatted} กิโลเมตร\nค่าจัดส่ง: ${fee} บาท`;
+            const tier = getDeliveryTier(distanceKm);
+
+            const resultsEl = document.getElementById('results');
+            const noDeliveryEl = document.getElementById('no-delivery');
+
+            // Reset both panels
+            resultsEl.classList.remove('show');
+            noDeliveryEl.classList.remove('show');
+
+            highlightTier(tier.tierIndex);
+
+            if (tier.fee === null) {
+                // Out of range
+                document.getElementById('no-delivery-dist').innerText = `ระยะทางของคุณ: ${distFormatted} กม. (เกิน 7 กม.)`;
+                noDeliveryEl.classList.add('show');
+                currentResultText = `location ร้าน Chawave Coffee and Tea ${STORE_LAT}, ${STORE_LNG}\nระยะทาง: ${distFormatted} กิโลเมตร\nค่าจัดส่ง: ไม่รับจัดส่ง (เกินพื้นที่)`;
+            } else {
+                document.getElementById('res-distance').innerText = `${distFormatted} กม.`;
+                document.getElementById('res-fee').innerText = `${tier.fee > 0 ? tier.fee + ' บาท' : 'ส่งฟรี! 🎉'}`;
+                resultsEl.classList.add('show');
+                currentResultText = `location ร้าน Chawave Coffee and Tea ${STORE_LAT}, ${STORE_LNG}\nระยะทาง: ${distFormatted} กิโลเมตร\nค่าจัดส่ง: ${tier.fee > 0 ? tier.fee + ' บาท' : 'ฟรี'}`;
+            }
         }
 
         document.getElementById('btn-current-location').addEventListener('click', () => {
