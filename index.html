@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chawave Coffee & Tea - Delivery Calculator</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #4e342e; /* Dark Coffee */
+            --secondary: #8d6e63; /* Milk Coffee */
+            --accent: #d7ccc8; /* Latte */
+            --background: #efebe9; /* Light background */
+            --surface: #ffffff;
+            --text-main: #3e2723;
+            --text-light: #795548;
+            --success: #388e3c;
+            --radius: 16px;
+            --shadow: 0 8px 30px rgba(78, 52, 46, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Prompt', 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin: auto 0;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), #3e2723);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.5px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            color: var(--accent);
+            opacity: 0.9;
+        }
+
+        .store-info {
+            padding: 1rem 1.5rem;
+            background: var(--surface);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .store-info i {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            margin-top: 3px;
+        }
+
+        .store-info div p {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .store-info div span {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            word-break: break-all;
+        }
+
+        .map-container {
+            height: 280px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .actions {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.85rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(78, 52, 46, 0.2);
+        }
+
+        .btn:hover {
+            background: #3e2723;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(78, 52, 46, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: var(--secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: var(--accent);
+            color: var(--text-main);
+            border-color: transparent;
+            box-shadow: none;
+        }
+
+        .results {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 0.5rem;
+            border: 1px solid var(--accent);
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed var(--accent);
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+            margin-top: 0.5rem;
+            padding-bottom: 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .result-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .fee-highlight {
+            font-size: 1.5rem;
+            color: var(--success);
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--secondary);
+            padding: 1rem;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(62, 39, 35, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Chawave Coffee & Tea</h1>
+            <p>ระบบคำนวณค่าจัดส่ง</p>
+        </div>
+
+        <div class="store-info">
+            <i class="fa-solid fa-store"></i>
+            <div>
+                <p>ตำแหน่งร้าน Chawave</p>
+                <span>14.658529359926023, 104.22206111928476</span>
+            </div>
+        </div>
+
+        <div id="map" class="map-container"></div>
+
+        <div class="actions">
+            <button class="btn" id="btn-current-location">
+                <i class="fa-solid fa-location-crosshairs"></i> ใช้ตำแหน่งปัจจุบันของฉัน
+            </button>
+            <p style="text-align:center; font-size: 0.8rem; color: var(--text-light); margin-top: -5px;">
+                *หรือแตะบนแผนที่เพื่อระบุจุดส่ง
+            </p>
+
+            <div id="loading" class="loading">
+                <i class="fa-solid fa-spinner fa-spin"></i> กำลังคำนวณระยะทางและเส้นทาง...
+            </div>
+            
+            <div id="error" class="error-message"></div>
+
+            <div id="results" class="results">
+                <div class="result-row">
+                    <span class="result-label"><i class="fa-solid fa-route"></i> ระยะทาง</span>
+                    <span class="result-value" id="res-distance">0.00 กม.</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label"><i class="fa-solid fa-motorcycle"></i> ค่าจัดส่ง</span>
+                    <span class="result-value fee-highlight" id="res-fee">0 บาท</span>
+                </div>
+                <button class="btn btn-outline" style="width: 100%; margin-top: 1rem;" id="btn-copy">
+                    <i class="fa-regular fa-copy"></i> คัดลอกผลลัพธ์
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"><i class="fa-solid fa-check-circle"></i> คัดลอกผลลัพธ์สำเร็จ</div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script>
+        const STORE_LAT = 14.658529359926023;
+        const STORE_LNG = 104.22206111928476;
+        const FREE_DISTANCE_KM = 1;
+        const RATE_PER_KM = 7;
+
+        let map, storeMarker, destMarker, routeLine;
+        let currentResultText = '';
+
+        function initMap() {
+            // Set initial map view to store location
+            map = L.map('map').setView([STORE_LAT, STORE_LNG], 14);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19,
+            }).addTo(map);
+
+            // Custom Store Icon
+            const storeIcon = L.divIcon({
+                html: '<i class="fa-solid fa-location-dot fa-3x" style="color: #4e342e; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>',
+                className: 'custom-div-icon',
+                iconSize: [30, 42],
+                iconAnchor: [15, 42]
+            });
+
+            storeMarker = L.marker([STORE_LAT, STORE_LNG], {icon: storeIcon}).addTo(map)
+                .bindPopup('<b style="font-family: Prompt;">Chawave Coffee & Tea</b>').openPopup();
+
+            // Handle map clicks
+            map.on('click', function(e) {
+                setDestination(e.latlng.lat, e.latlng.lng);
+            });
+        }
+
+        function setDestination(lat, lng) {
+            if (destMarker) {
+                map.removeLayer(destMarker);
+            }
+            
+            const destIcon = L.divIcon({
+                html: '<i class="fa-solid fa-location-dot fa-3x" style="color: #d32f2f; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>',
+                className: 'custom-div-icon',
+                iconSize: [30, 42],
+                iconAnchor: [15, 42]
+            });
+
+            destMarker = L.marker([lat, lng], {icon: destIcon}).addTo(map);
+            calculateRouteAndFee(lat, lng);
+        }
+
+        async function calculateRouteAndFee(destLat, destLng) {
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const errorMsg = document.getElementById('error');
+            
+            loading.style.display = 'block';
+            results.classList.remove('show');
+            errorMsg.style.display = 'none';
+
+            try {
+                // OSRM coordinates format: longitude,latitude
+                const url = `https://router.project-osrm.org/route/v1/driving/${STORE_LNG},${STORE_LAT};${destLng},${destLat}?overview=full&geometries=geojson`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) {
+                    throw new Error('ไม่สามารถคำนวณเส้นทางได้ กรุณาลองเลือกจุดส่งใหม่');
+                }
+
+                const route = data.routes[0];
+                const distanceMeters = route.distance;
+                const distanceKm = distanceMeters / 1000;
+                
+                // Draw route
+                if (routeLine) {
+                    map.removeLayer(routeLine);
+                }
+                
+                // GeoJSON coordinates are [longitude, latitude], Leaflet needs [latitude, longitude]
+                const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                routeLine = L.polyline(coordinates, {
+                    color: '#388e3c', 
+                    weight: 5, 
+                    opacity: 0.8,
+                    lineCap: 'round',
+                    lineJoin: 'round'
+                }).addTo(map);
+                
+                map.fitBounds(routeLine.getBounds(), {padding: [40, 40]});
+
+                displayResults(distanceKm, destLat, destLng);
+
+            } catch (err) {
+                errorMsg.innerText = err.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่';
+                errorMsg.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function displayResults(distanceKm, destLat, destLng) {
+            let fee = 0;
+            if (distanceKm > FREE_DISTANCE_KM) {
+                fee = distanceKm * RATE_PER_KM;
+            }
+            fee = Math.ceil(fee); // Round up to nearest integer
+
+            const distFormatted = distanceKm.toFixed(2);
+            document.getElementById('res-distance').innerText = `${distFormatted} กม.`;
+            document.getElementById('res-fee').innerText = `${fee > 0 ? fee + ' บาท' : 'ส่งฟรี!'}`;
+            
+            document.getElementById('results').classList.add('show');
+            
+            // Format output exactly as requested
+            currentResultText = `location ร้าน Chawave Coffee and Tea ${STORE_LAT}, ${STORE_LNG}\nระยะทาง: ${distFormatted} กิโลเมตร\nค่าจัดส่ง: ${fee} บาท`;
+        }
+
+        document.getElementById('btn-current-location').addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                alert('เบราว์เซอร์ของคุณไม่รองรับการระบุตำแหน่ง');
+                return;
+            }
+            
+            const btn = document.getElementById('btn-current-location');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังหาตำแหน่ง...';
+            btn.disabled = true;
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    setDestination(position.coords.latitude, position.coords.longitude);
+                },
+                (error) => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    let errorMsg = 'ไม่สามารถดึงตำแหน่งปัจจุบันได้ กรุณาอนุญาตการเข้าถึงตำแหน่งหรือเลือกบนแผนที่';
+                    if (error.code === 1) errorMsg = 'คุณปฏิเสธการเข้าถึงตำแหน่ง กรุณาเลือกจุดส่งบนแผนที่';
+                    alert(errorMsg);
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        });
+
+        document.getElementById('btn-copy').addEventListener('click', () => {
+            if (!currentResultText) return;
+            
+            navigator.clipboard.writeText(currentResultText).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }).catch(err => {
+                alert('ไม่สามารถคัดลอกได้');
+                console.error('Copy error:', err);
+            });
+        });
+
+        // Initialize Map
+        document.addEventListener('DOMContentLoaded', initMap);
+
+    </script>
+</body>
+</html>
