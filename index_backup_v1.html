@@ -103,37 +103,6 @@
             transform: translateY(-50%) scale(1.1);
         }
 
-        /* ---- Delivery Zone Badge ---- */
-        .zone-banner {
-            background: linear-gradient(90deg, #e8f5e9, #f1f8e9);
-            border-bottom: 2px solid #a5d6a7;
-            padding: 0.6rem 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .zone-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.78rem;
-            font-weight: 500;
-        }
-
-        .zone-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .zone-dot.free { background: #2e7d32; }
-        .zone-dot.paid { background: #f57c00; }
-        .zone-dot.none { background: #c62828; }
-
         /* ---- Modal ---- */
         .modal-overlay {
             position: fixed;
@@ -251,6 +220,17 @@
             flex-shrink: 0;
         }
 
+        .info-badge {
+            display: inline-block;
+            background: #e8f5e9;
+            color: var(--success);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-left: 6px;
+        }
+
         .modal-fee-table {
             width: 100%;
             border-collapse: collapse;
@@ -270,93 +250,51 @@
         .modal-fee-table th:last-child { text-align: right; }
 
         .modal-fee-table td {
-            padding: 0.65rem 1rem;
+            padding: 0.55rem 1rem;
             border-bottom: 1px solid var(--accent);
             color: var(--text-main);
-            vertical-align: middle;
         }
 
         .modal-fee-table td:last-child {
             text-align: right;
             font-weight: 600;
+            color: var(--success);
         }
 
         .modal-fee-table tr:last-child td { border-bottom: none; }
+        .modal-fee-table tr:last-child td:last-child { color: #d32f2f; }
 
         .modal-fee-table tr:nth-child(even) td {
             background: #fafafa;
         }
 
-        /* color per row */
-        .fee-row-free td:last-child { color: #2e7d32; }
-        .fee-row-paid td:last-child { color: #e65100; }
-        .fee-row-none td:last-child { color: #c62828; }
-
-        .fee-zone-chip {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 5px;
-            vertical-align: middle;
-        }
-
-        /* Big visual zone cards in modal */
-        .zone-cards {
+        .store-info {
+            padding: 1rem 1.5rem;
+            background: var(--surface);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
             display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
+            align-items: flex-start;
+            gap: 12px;
         }
 
-        .zone-card {
-            display: flex;
-            align-items: center;
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            gap: 0.85rem;
+        .store-info i {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            margin-top: 3px;
         }
 
-        .zone-card.free-zone {
-            background: #e8f5e9;
-            border: 1.5px solid #a5d6a7;
-        }
-
-        .zone-card.paid-zone {
-            background: #fff3e0;
-            border: 1.5px solid #ffcc80;
-        }
-
-        .zone-card.none-zone {
-            background: #ffebee;
-            border: 1.5px solid #ef9a9a;
-        }
-
-        .zone-card-icon {
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-
-        .zone-card-info {
-            flex: 1;
-        }
-
-        .zone-card-range {
-            font-size: 0.85rem;
-            font-weight: 600;
+        .store-info div p {
+            font-size: 0.9rem;
+            font-weight: 500;
             color: var(--text-main);
         }
 
-        .zone-card-fee {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-top: 2px;
+        .store-info div span {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            word-break: break-all;
         }
 
-        .zone-card.free-zone .zone-card-fee { color: #2e7d32; }
-        .zone-card.paid-zone .zone-card-fee { color: #e65100; }
-        .zone-card.none-zone .zone-card-fee { color: #c62828; }
-
-        /* Map */
         .map-container {
             height: 420px;
             width: 100%;
@@ -434,57 +372,11 @@
             display: none;
         }
 
-        .results.show {
-            display: block;
-            animation: fadeIn 0.4s ease;
-        }
-
-        /* Result card style */
-        .result-card {
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .result-card.free-card {
-            background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
-            border: 1.5px solid #a5d6a7;
-        }
-
-        .result-card.paid-card {
-            background: linear-gradient(135deg, #fff3e0, #fff8f0);
-            border: 1.5px solid #ffcc80;
-        }
-
-        .result-card-icon {
-            font-size: 1.8rem;
-            flex-shrink: 0;
-        }
-
-        .result-card-body {}
-
-        .result-card-label {
-            font-size: 0.78rem;
-            color: var(--text-light);
-            margin-bottom: 2px;
-        }
-
-        .result-card-value {
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-
-        .result-card.free-card .result-card-value { color: #2e7d32; }
-        .result-card.paid-card .result-card-value { color: #e65100; }
-
         .no-delivery {
-            background: linear-gradient(135deg, #ffebee, #fce4ec);
-            border: 1.5px solid #ef9a9a;
+            background: #fff3f3;
+            border: 1px solid #ffcdd2;
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 1.25rem;
             margin-top: 0.5rem;
             text-align: center;
             display: none;
@@ -496,28 +388,90 @@
         }
 
         .no-delivery .no-delivery-icon {
-            font-size: 2.5rem;
+            font-size: 2rem;
             margin-bottom: 0.5rem;
         }
 
-        .no-delivery .nd-title {
+        .no-delivery p {
             color: #c62828;
-            font-weight: 700;
-            font-size: 1.05rem;
-            margin-bottom: 0.25rem;
+            font-weight: 600;
+            font-size: 1rem;
         }
 
-        .no-delivery .nd-dist {
+        .no-delivery span {
             color: #b71c1c;
-            font-size: 0.9rem;
-            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
         }
 
-        .no-delivery .nd-hint {
-            font-size: 0.8rem;
-            color: #795548;
-            margin-top: 6px;
+        .fee-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            margin-top: 0.5rem;
+        }
+
+        .fee-table th {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .fee-table th:last-child {
+            text-align: right;
+        }
+
+        .fee-table td {
+            padding: 0.45rem 0.75rem;
+            border-bottom: 1px solid var(--accent);
+            color: var(--text-main);
+        }
+
+        .fee-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        .fee-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .fee-table tr:last-child td:last-child {
+            color: #d32f2f;
+        }
+
+        .fee-table tr.active-tier td {
+            background: rgba(56, 142, 60, 0.1);
+            font-weight: 600;
+        }
+
+        .fee-table tr.active-tier td:last-child {
+            color: var(--success);
+        }
+
+        .table-section {
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .table-section .table-title {
+            font-size: 0.82rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .results.show {
             display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .result-row {
@@ -546,6 +500,11 @@
             font-size: 1.1rem;
             font-weight: 600;
             color: var(--text-main);
+        }
+
+        .fee-highlight {
+            font-size: 1.5rem;
+            color: var(--success);
         }
 
         .error-message {
@@ -585,28 +544,6 @@
             opacity: 1;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .free-badge {
-            display: inline-block;
-            background: #2e7d32;
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 20px;
-            margin-left: 6px;
-            animation: pulse 2s infinite;
-        }
-
     </style>
 </head>
 <body>
@@ -620,21 +557,7 @@
             </button>
         </div>
 
-        <!-- Quick zone banner -->
-        <div class="zone-banner">
-            <div class="zone-item">
-                <span class="zone-dot free"></span>
-                <span>ไม่เกิน 3 กม. — <strong>ฟรี!</strong></span>
-            </div>
-            <div class="zone-item">
-                <span class="zone-dot paid"></span>
-                <span>3–5 กม. — <strong>30 ฿</strong></span>
-            </div>
-            <div class="zone-item">
-                <span class="zone-dot none"></span>
-                <span>เกิน 5 กม. — <strong>นอกพื้นที่</strong></span>
-            </div>
-        </div>
+
 
         <div id="map" class="map-container"></div>
 
@@ -653,29 +576,30 @@
             <div id="error" class="error-message"></div>
 
             <div id="results" class="results">
-                <!-- Distance row -->
                 <div class="result-row">
                     <span class="result-label"><i class="fa-solid fa-route"></i> ระยะทาง</span>
                     <span class="result-value" id="res-distance">0.00 กม.</span>
                 </div>
-
-                <!-- Fee card (injected dynamically) -->
-                <div id="fee-card-container"></div>
-
-                <button class="btn btn-outline" style="width: 100%; margin-top: 0.75rem;" id="btn-copy">
+                <div class="result-row">
+                    <span class="result-label"><i class="fa-solid fa-motorcycle"></i> ค่าจัดส่ง</span>
+                    <span class="result-value fee-highlight" id="res-fee">0 บาท</span>
+                </div>
+                <button class="btn btn-outline" style="width: 100%; margin-top: 1rem;" id="btn-copy">
                     <i class="fa-regular fa-copy"></i> คัดลอกผลลัพธ์
                 </button>
             </div>
 
             <div id="no-delivery" class="no-delivery">
                 <div class="no-delivery-icon">🛵❌</div>
-                <p class="nd-title">นอกพื้นที่บริการจัดส่ง</p>
-                <p class="nd-dist" id="no-delivery-dist"></p>
-                <span class="nd-hint">กรุณาติดต่อร้านโดยตรงเพื่อสอบถามเพิ่มเติม</span>
+                <p>ระยะทางเกินพื้นที่จัดส่ง</p>
+                <span id="no-delivery-dist"></span><br>
+                <span style="font-size:0.8rem; color:#795548; margin-top:4px; display:block;">กรุณาติดต่อร้านเพื่อปรับราคาตามระยะทาง</span>
             </div>
         </div>
     </div>
 
+
+    
     <div id="toast" class="toast"><i class="fa-solid fa-check-circle"></i> คัดลอกผลลัพธ์สำเร็จ</div>
 
     <!-- Info Modal -->
@@ -709,32 +633,25 @@
                     </div>
                 </div>
 
-                <!-- Delivery Fee Zone Cards -->
+                <!-- Delivery Fee Table -->
                 <div class="info-section">
-                    <p class="info-section-title">พื้นที่และค่าบริการจัดส่ง</p>
-                    <div class="zone-cards">
-                        <div class="zone-card free-zone">
-                            <div class="zone-card-icon">🆓</div>
-                            <div class="zone-card-info">
-                                <div class="zone-card-range">ไม่เกิน 3 กิโลเมตร</div>
-                                <div class="zone-card-fee">ส่งฟรี! 🎉</div>
-                            </div>
-                        </div>
-                        <div class="zone-card paid-zone">
-                            <div class="zone-card-icon">🛵</div>
-                            <div class="zone-card-info">
-                                <div class="zone-card-range">3 – 5 กิโลเมตร</div>
-                                <div class="zone-card-fee">30 บาท</div>
-                            </div>
-                        </div>
-                        <div class="zone-card none-zone">
-                            <div class="zone-card-icon">❌</div>
-                            <div class="zone-card-info">
-                                <div class="zone-card-range">มากกว่า 5 กิโลเมตร</div>
-                                <div class="zone-card-fee">นอกพื้นที่บริการ</div>
-                            </div>
-                        </div>
-                    </div>
+                    <p class="info-section-title">ค่าบริการจัดส่ง (มอเตอร์ไซต์)</p>
+                    <table class="modal-fee-table">
+                        <thead>
+                            <tr>
+                                <th>ช่วงระยะทาง</th>
+                                <th>ค่าจัดส่ง</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>0 – 1 กม.</td><td>ส่งฟรี 🎉</td></tr>
+                            <tr><td>1 – 2 กม.</td><td>15 บาท</td></tr>
+                            <tr><td>2 – 3 กม.</td><td>20 บาท</td></tr>
+                            <tr><td>3 – 5 กม.</td><td>30 บาท</td></tr>
+                            <tr><td>5 – 7 กม.</td><td>45 บาท</td></tr>
+                            <tr><td>เกิน 7 กม.</td><td>ไม่รับจัดส่ง ❌</td></tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- Notes -->
@@ -746,7 +663,7 @@
                     </div>
                     <div class="info-row">
                         <i class="fa-solid fa-triangle-exclamation" style="color:#f57c00;"></i>
-                        <span>กรณีเกิน 5 กม. กรุณาติดต่อร้านโดยตรงเพื่อสอบถาม</span>
+                        <span>กรณีเกิน 7 กม. กรุณาติดต่อร้านโดยตรงเพื่อเจรจาราคา</span>
                     </div>
                 </div>
 
@@ -760,16 +677,14 @@
         const STORE_LAT = 14.658529359926023;
         const STORE_LNG = 104.22206111928476;
 
-        // ============================================================
-        // Delivery pricing: 3 tiers only
-        //   0 – 3 km  → Free
-        //   3 – 5 km  → 30 baht
-        //   > 5 km    → Outside service area (null)
-        // ============================================================
+        // Tier-based delivery pricing
         const DELIVERY_TIERS = [
-            { maxKm: 3,        fee: 0,    label: 'ส่งฟรี! 🎉',        zone: 'free' },
-            { maxKm: 5,        fee: 30,   label: '30 บาท',             zone: 'paid' },
-            { maxKm: Infinity, fee: null, label: 'นอกพื้นที่บริการ',  zone: 'none' },
+            { maxKm: 1,   fee: 0,    tierIndex: 0 },  // 0-1 km: Free
+            { maxKm: 2,   fee: 15,   tierIndex: 1 },  // 1-2 km: 15 บาท
+            { maxKm: 3,   fee: 20,   tierIndex: 2 },  // 2-3 km: 20 บาท
+            { maxKm: 5,   fee: 30,   tierIndex: 3 },  // 3-5 km: 30 บาท
+            { maxKm: 7,   fee: 45,   tierIndex: 4 },  // 5-7 km: 45 บาท
+            { maxKm: Infinity, fee: null, tierIndex: 5 } // 7+ km: ไม่รับจัดส่ง
         ];
 
         function getDeliveryTier(distanceKm) {
@@ -780,6 +695,7 @@
         let currentResultText = '';
 
         function initMap() {
+            // Set initial map view to store location
             map = L.map('map').setView([STORE_LAT, STORE_LNG], 14);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -787,7 +703,7 @@
                 maxZoom: 19,
             }).addTo(map);
 
-            // Store icon
+            // Custom Store Icon
             const storeIcon = L.divIcon({
                 html: '<i class="fa-solid fa-location-dot fa-3x" style="color: #4e342e; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>',
                 className: 'custom-div-icon',
@@ -798,6 +714,7 @@
             storeMarker = L.marker([STORE_LAT, STORE_LNG], {icon: storeIcon}).addTo(map)
                 .bindPopup('<b style="font-family: Prompt;">Chawave Coffee & Tea</b>').openPopup();
 
+            // Handle map clicks
             map.on('click', function(e) {
                 setDestination(e.latlng.lat, e.latlng.lng);
             });
@@ -823,14 +740,13 @@
             const loading = document.getElementById('loading');
             const results = document.getElementById('results');
             const errorMsg = document.getElementById('error');
-            const noDeliveryEl = document.getElementById('no-delivery');
             
             loading.style.display = 'block';
             results.classList.remove('show');
-            noDeliveryEl.classList.remove('show');
             errorMsg.style.display = 'none';
 
             try {
+                // OSRM coordinates format: longitude,latitude
                 const url = `https://router.project-osrm.org/route/v1/driving/${STORE_LNG},${STORE_LAT};${destLng},${destLat}?overview=full&geometries=geojson`;
                 const response = await fetch(url);
                 const data = await response.json();
@@ -840,20 +756,20 @@
                 }
 
                 const route = data.routes[0];
-                const distanceKm = route.distance / 1000;
+                const distanceMeters = route.distance;
+                const distanceKm = distanceMeters / 1000;
                 
-                // Draw route line color based on zone
-                if (routeLine) map.removeLayer(routeLine);
+                // Draw route
+                if (routeLine) {
+                    map.removeLayer(routeLine);
+                }
                 
-                const tier = getDeliveryTier(distanceKm);
-                const lineColor = tier.zone === 'free' ? '#2e7d32' :
-                                  tier.zone === 'paid' ? '#e65100' : '#c62828';
-
+                // GeoJSON coordinates are [longitude, latitude], Leaflet needs [latitude, longitude]
                 const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
                 routeLine = L.polyline(coordinates, {
-                    color: lineColor,
-                    weight: 5,
-                    opacity: 0.85,
+                    color: '#388e3c', 
+                    weight: 5, 
+                    opacity: 0.8,
                     lineCap: 'round',
                     lineJoin: 'round'
                 }).addTo(map);
@@ -870,6 +786,14 @@
             }
         }
 
+        function highlightTier(tierIndex) {
+            document.querySelectorAll('#fee-table tbody tr').forEach(row => {
+                row.classList.remove('active-tier');
+            });
+            const activeRow = document.querySelector(`#fee-table tbody tr[data-tier="${tierIndex}"]`);
+            if (activeRow) activeRow.classList.add('active-tier');
+        }
+
         function displayResults(distanceKm, destLat, destLng) {
             const distFormatted = distanceKm.toFixed(2);
             const tier = getDeliveryTier(distanceKm);
@@ -877,52 +801,22 @@
             const resultsEl = document.getElementById('results');
             const noDeliveryEl = document.getElementById('no-delivery');
 
+            // Reset both panels
             resultsEl.classList.remove('show');
             noDeliveryEl.classList.remove('show');
 
+            highlightTier(tier.tierIndex);
+
             if (tier.fee === null) {
-                // Outside service area
-                document.getElementById('no-delivery-dist').innerText =
-                    `ระยะทางของคุณ: ${distFormatted} กม. (เกิน 5 กม.)`;
+                // Out of range
+                document.getElementById('no-delivery-dist').innerText = `ระยะทางของคุณ: ${distFormatted} กม. (เกิน 7 กม.)`;
                 noDeliveryEl.classList.add('show');
-                currentResultText =
-                    `📍 location ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
-                    `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                    `ค่าจัดส่ง: นอกพื้นที่บริการ`;
+                currentResultText = `📍 location ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\nระยะทาง: ${distFormatted} กิโลเมตร\nค่าจัดส่ง: ไม่รับจัดส่ง (เกินพื้นที่)`;
             } else {
                 document.getElementById('res-distance').innerText = `${distFormatted} กม.`;
-
-                // Render fee card
-                const container = document.getElementById('fee-card-container');
-                if (tier.zone === 'free') {
-                    container.innerHTML = `
-                        <div class="result-card free-card">
-                            <div class="result-card-icon">🎉</div>
-                            <div class="result-card-body">
-                                <div class="result-card-label">ค่าจัดส่ง (ไม่เกิน 3 กม.)</div>
-                                <div class="result-card-value">ส่งฟรี!</div>
-                            </div>
-                        </div>`;
-                    currentResultText =
-                        `📍 location ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
-                        `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                        `ค่าจัดส่ง: ฟรี 🎉`;
-                } else {
-                    container.innerHTML = `
-                        <div class="result-card paid-card">
-                            <div class="result-card-icon">🛵</div>
-                            <div class="result-card-body">
-                                <div class="result-card-label">ค่าจัดส่ง (3–5 กม.)</div>
-                                <div class="result-card-value">30 บาท</div>
-                            </div>
-                        </div>`;
-                    currentResultText =
-                        `📍 location ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
-                        `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                        `ค่าจัดส่ง: 30 บาท`;
-                }
-
+                document.getElementById('res-fee').innerText = `${tier.fee > 0 ? tier.fee + ' บาท' : 'ส่งฟรี! 🎉'}`;
                 resultsEl.classList.add('show');
+                currentResultText = `📍 location ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\nระยะทาง: ${distFormatted} กิโลเมตร\nค่าจัดส่ง: ${tier.fee > 0 ? tier.fee + ' บาท' : 'ฟรี'}`;
             }
         }
 
@@ -960,12 +854,16 @@
             navigator.clipboard.writeText(currentResultText).then(() => {
                 const toast = document.getElementById('toast');
                 toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 3000);
-            }).catch(() => {
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }).catch(err => {
                 alert('ไม่สามารถคัดลอกได้');
+                console.error('Copy error:', err);
             });
         });
 
+        // Initialize Map
         document.addEventListener('DOMContentLoaded', initMap);
 
         // Info Modal
