@@ -837,7 +837,8 @@
             errorMsg.style.display = 'none';
 
             try {
-                const url = `https://router.project-osrm.org/route/v1/driving/${STORE_LNG},${STORE_LAT};${destLng},${destLat}?overview=full&geometries=geojson`;
+                // ขอ alternatives เพื่อเปรียบเทียบและเลือกเส้นที่ใกล้ที่สุด
+                const url = `https://router.project-osrm.org/route/v1/driving/${STORE_LNG},${STORE_LAT};${destLng},${destLat}?overview=full&geometries=geojson&alternatives=3`;
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -845,7 +846,11 @@
                     throw new Error('ไม่สามารถคำนวณเส้นทางได้ กรุณาลองเลือกจุดส่งใหม่');
                 }
 
-                const route = data.routes[0];
+                // เลือกเส้นทางที่ระยะทางสั้นที่สุดเสมอ
+                const route = data.routes.reduce((shortest, r) =>
+                    r.distance < shortest.distance ? r : shortest
+                , data.routes[0]);
+
                 const distanceKm = route.distance / 1000;
                 
                 // Draw route line color based on zone
