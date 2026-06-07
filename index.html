@@ -31,41 +31,28 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Prompt', 'Outfit', sans-serif;
         }
 
         body {
+            font-family: 'Prompt', sans-serif;
             background-color: var(--background);
             color: var(--text-main);
             display: flex;
-            justify-content: center;
+            align-items: stretch;
             min-height: 100dvh;
-            padding: 1rem;
+            padding: 0;
+            margin: 0;
         }
 
         .container {
             width: 100%;
-            max-width: 500px;
+            max-width: none;
             background: var(--surface);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
+            border-radius: 0;
+            box-shadow: none;
             display: flex;
             flex-direction: column;
-            margin: auto 0;
-        }
-
-        /* Mobile: เต็มจอ ไม่มี padding/border-radius */
-        @media (max-width: 600px) {
-            body {
-                padding: 0;
-                align-items: stretch;
-            }
-            .container {
-                border-radius: 0;
-                box-shadow: none;
-                min-height: 100dvh;
-            }
+            min-height: 100dvh;
         }
 
         .header {
@@ -377,25 +364,12 @@
 
         /* Map */
         .map-container {
-            height: 420px;
+            flex: 1 1 auto;
             width: 100%;
+            height: auto;
+            min-height: 350px;
             position: relative;
             z-index: 1;
-            flex-shrink: 0;
-        }
-
-        @media (max-width: 600px) {
-            .map-container {
-                flex: 1 1 auto;
-                height: auto;
-                min-height: 250px;
-            }
-        }
-
-        @media (max-height: 700px) and (min-width: 601px) {
-            .map-container {
-                height: 300px;
-            }
         }
 
         .actions {
