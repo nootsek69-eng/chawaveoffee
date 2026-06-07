@@ -629,6 +629,78 @@
             animation: pulse 2s infinite;
         }
 
+        /* ---- Cup Counter ---- */
+        .cup-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #faf6f4;
+            border: 1.5px solid var(--accent);
+            border-radius: 12px;
+            padding: 0.65rem 1rem;
+        }
+
+        .cup-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.88rem;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .cup-label i { color: var(--secondary); }
+
+        .cup-hint {
+            font-size: 0.73rem;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        .cup-counter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cup-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1.5px solid var(--secondary);
+            background: white;
+            color: var(--primary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .cup-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .cup-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .cup-num {
+            font-size: 1.15rem;
+            font-weight: 700;
+            min-width: 28px;
+            text-align: center;
+            color: var(--text-main);
+        }
+
+        .cup-num.highlight {
+            color: #2e7d32;
+        }
+
         /* ---- Search Box ---- */
         .search-wrapper {
             padding: 0.65rem 0.9rem;
@@ -769,6 +841,20 @@
         <div id="map" class="map-container"></div>
 
         <div class="actions">
+            <!-- Cup Counter -->
+            <div class="cup-row">
+                <div class="cup-label">
+                    <i class="fa-solid fa-mug-hot"></i>
+                    <span>จำนวนแก้ว</span>
+                    <span class="cup-hint">(5 แก้วขึ้นไป ส่งฟรีใน 3 กม.)</span>
+                </div>
+                <div class="cup-counter">
+                    <button class="cup-btn" id="cup-minus"><i class="fa-solid fa-minus"></i></button>
+                    <span class="cup-num" id="cup-count">1</span>
+                    <button class="cup-btn" id="cup-plus"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+
             <button class="btn" id="btn-current-location">
                 <i class="fa-solid fa-location-crosshairs"></i> ใช้ตำแหน่งปัจจุบันของฉัน
             </button>
@@ -892,18 +978,19 @@
 
         // ============================================================
         // Delivery pricing: 3 tiers only
-        //   0 – 3 km  → Free
-        //   3 – 5 km  → 30 baht
-        //   > 5 km    → Outside service area (null)
+        //   0 – 3 km + 5+ cups  → Free
+        //   0 – 3 km < 5 cups   → 15 baht
+        //   3 – 5 km            → 30 baht
+        //   > 5 km              → Outside service area (null)
         // ============================================================
-        const DELIVERY_TIERS = [
-            { maxKm: 3,        fee: 0,    label: 'ส่งฟรี! 🎉',        zone: 'free' },
-            { maxKm: 5,        fee: 30,   label: '30 บาท',             zone: 'paid' },
-            { maxKm: Infinity, fee: null, label: 'นอกพื้นที่บริการ',  zone: 'none' },
-        ];
+        let cupCount = 1;
 
-        function getDeliveryTier(distanceKm) {
-            return DELIVERY_TIERS.find(tier => distanceKm <= tier.maxKm);
+        function getDeliveryFee(distanceKm, cups) {
+            if (distanceKm > 5)  return { fee: null,  zone: 'none', label: 'นอกพื้นที่บริการ' };
+            if (distanceKm > 3)  return { fee: 30,    zone: 'paid', label: '30 บาท' };
+            // within 3 km
+            if (cups >= 5)       return { fee: 0,     zone: 'free', label: 'ส่งฟรี! 🎉' };
+            return                        { fee: 15,   zone: 'paid15', label: '15 บาท' };
         }
 
         let map, storeMarker, destMarker, routeLine;
@@ -980,9 +1067,9 @@
                 // Draw route line color based on zone
                 if (routeLine) map.removeLayer(routeLine);
                 
-                const tier = getDeliveryTier(distanceKm);
-                const lineColor = tier.zone === 'free' ? '#2e7d32' :
-                                  tier.zone === 'paid' ? '#e65100' : '#c62828';
+                const feeInfo = getDeliveryFee(distanceKm, cupCount);
+                const lineColor = feeInfo.zone === 'free'   ? '#2e7d32' :
+                                  feeInfo.zone === 'none'   ? '#c62828' : '#e65100';
 
                 const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
                 routeLine = L.polyline(coordinates, {
@@ -1007,7 +1094,7 @@
 
         function displayResults(distanceKm, destLat, destLng) {
             const distFormatted = distanceKm.toFixed(2);
-            const tier = getDeliveryTier(distanceKm);
+            const feeInfo = getDeliveryFee(distanceKm, cupCount);
 
             const resultsEl = document.getElementById('results');
             const noDeliveryEl = document.getElementById('no-delivery');
@@ -1015,46 +1102,50 @@
             resultsEl.classList.remove('show');
             noDeliveryEl.classList.remove('show');
 
-            if (tier.fee === null) {
-                // Outside service area
+            if (feeInfo.fee === null) {
                 document.getElementById('no-delivery-dist').innerText =
                     `ระยะทางของคุณ: ${distFormatted} กม. (เกิน 5 กม.)`;
                 noDeliveryEl.classList.add('show');
                 currentResultText =
                     `📍 location ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
                     `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
+                    `จำนวน: ${cupCount} แก้ว\n` +
                     `ค่าจัดส่ง: นอกพื้นที่บริการ`;
             } else {
                 document.getElementById('res-distance').innerText = `${distFormatted} กม.`;
 
-                // Render fee card
                 const container = document.getElementById('fee-card-container');
-                if (tier.zone === 'free') {
+                if (feeInfo.zone === 'free') {
                     container.innerHTML = `
                         <div class="result-card free-card">
                             <div class="result-card-icon">🎉</div>
                             <div class="result-card-body">
-                                <div class="result-card-label">ค่าจัดส่ง (ไม่เกิน 3 กม.)</div>
+                                <div class="result-card-label">ค่าจัดส่ง · ${cupCount} แก้ว · ไม่เกิน 3 กม.</div>
                                 <div class="result-card-value">ส่งฟรี!</div>
                             </div>
                         </div>`;
                     currentResultText =
                         `📍 location ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
                         `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
+                        `จำนวน: ${cupCount} แก้ว\n` +
                         `ค่าจัดส่ง: ฟรี 🎉`;
                 } else {
+                    const label = feeInfo.zone === 'paid15'
+                        ? `ค่าจัดส่ง · ${cupCount} แก้ว · ไม่เกิน 3 กม.`
+                        : `ค่าจัดส่ง · ${cupCount} แก้ว · 3–5 กม.`;
                     container.innerHTML = `
                         <div class="result-card paid-card">
                             <div class="result-card-icon">🛵</div>
                             <div class="result-card-body">
-                                <div class="result-card-label">ค่าจัดส่ง (3–5 กม.)</div>
-                                <div class="result-card-value">30 บาท</div>
+                                <div class="result-card-label">${label}</div>
+                                <div class="result-card-value">${feeInfo.fee} บาท</div>
                             </div>
                         </div>`;
                     currentResultText =
                         `📍 location ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
                         `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                        `ค่าจัดส่ง: 30 บาท`;
+                        `จำนวน: ${cupCount} แก้ว\n` +
+                        `ค่าจัดส่ง: ${feeInfo.fee} บาท`;
                 }
 
                 resultsEl.classList.add('show');
@@ -1184,6 +1275,38 @@
                 searchDropdown.innerHTML = '<div class="search-loading">เกิดข้อผิดพลาด กรุณาลองใหม่</div>';
             }
         }
+
+        // ============================================================
+        // Cup Counter +/-
+        // ============================================================
+        let lastDistKm = null, lastDestLat = null, lastDestLng = null;
+
+        function updateCupDisplay() {
+            const el = document.getElementById('cup-count');
+            el.textContent = cupCount;
+            el.classList.toggle('highlight', cupCount >= 5);
+            document.getElementById('cup-minus').disabled = cupCount <= 1;
+        }
+
+        document.getElementById('cup-plus').addEventListener('click', () => {
+            cupCount++;
+            updateCupDisplay();
+            if (lastDistKm !== null) displayResults(lastDistKm, lastDestLat, lastDestLng);
+        });
+
+        document.getElementById('cup-minus').addEventListener('click', () => {
+            if (cupCount > 1) { cupCount--; updateCupDisplay(); }
+            if (lastDistKm !== null) displayResults(lastDistKm, lastDestLat, lastDestLng);
+        });
+
+        // Override displayResults to cache last values for recalculation
+        const _origDisplay = displayResults;
+        displayResults = function(distKm, lat, lng) {
+            lastDistKm = distKm; lastDestLat = lat; lastDestLng = lng;
+            _origDisplay(distKm, lat, lng);
+        };
+
+        updateCupDisplay();
 
         document.addEventListener('DOMContentLoaded', initMap);
 
