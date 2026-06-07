@@ -841,20 +841,6 @@
         <div id="map" class="map-container"></div>
 
         <div class="actions">
-            <!-- Cup Counter -->
-            <div class="cup-row">
-                <div class="cup-label">
-                    <i class="fa-solid fa-mug-hot"></i>
-                    <span>จำนวนแก้ว</span>
-                    <span class="cup-hint">(5 แก้วขึ้นไป ส่งฟรีใน 3 กม.)</span>
-                </div>
-                <div class="cup-counter">
-                    <button class="cup-btn" id="cup-minus"><i class="fa-solid fa-minus"></i></button>
-                    <span class="cup-num" id="cup-count">1</span>
-                    <button class="cup-btn" id="cup-plus"><i class="fa-solid fa-plus"></i></button>
-                </div>
-            </div>
-
             <button class="btn" id="btn-current-location">
                 <i class="fa-solid fa-location-crosshairs"></i> ใช้ตำแหน่งปัจจุบันของฉัน
             </button>
@@ -1094,7 +1080,6 @@
 
         function displayResults(distanceKm, destLat, destLng) {
             const distFormatted = distanceKm.toFixed(2);
-            const feeInfo = getDeliveryFee(distanceKm, cupCount);
 
             const resultsEl = document.getElementById('results');
             const noDeliveryEl = document.getElementById('no-delivery');
@@ -1102,50 +1087,54 @@
             resultsEl.classList.remove('show');
             noDeliveryEl.classList.remove('show');
 
-            if (feeInfo.fee === null) {
+            if (distanceKm > 5) {
+                // นอกพื้นที่
                 document.getElementById('no-delivery-dist').innerText =
                     `ระยะทางของคุณ: ${distFormatted} กม. (เกิน 5 กม.)`;
                 noDeliveryEl.classList.add('show');
                 currentResultText =
-                    `📍 location ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
+                    `📍 ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
                     `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                    `จำนวน: ${cupCount} แก้ว\n` +
                     `ค่าจัดส่ง: นอกพื้นที่บริการ`;
             } else {
                 document.getElementById('res-distance').innerText = `${distFormatted} กม.`;
-
                 const container = document.getElementById('fee-card-container');
-                if (feeInfo.zone === 'free') {
+
+                if (distanceKm <= 3) {
+                    // โซนใกล้ — แสดง 2 กรณี
                     container.innerHTML = `
                         <div class="result-card free-card">
                             <div class="result-card-icon">🎉</div>
                             <div class="result-card-body">
-                                <div class="result-card-label">ค่าจัดส่ง · ${cupCount} แก้ว · ไม่เกิน 3 กม.</div>
+                                <div class="result-card-label">5 แก้วขึ้นไป · ไม่เกิน 3 กม.</div>
                                 <div class="result-card-value">ส่งฟรี!</div>
+                            </div>
+                        </div>
+                        <div class="result-card paid-card" style="margin-top:0.5rem;">
+                            <div class="result-card-icon">🛵</div>
+                            <div class="result-card-body">
+                                <div class="result-card-label">น้อยกว่า 5 แก้ว · ไม่เกิน 3 กม.</div>
+                                <div class="result-card-value">15 บาท</div>
                             </div>
                         </div>`;
                     currentResultText =
-                        `📍 location ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
+                        `📍 ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
                         `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                        `จำนวน: ${cupCount} แก้ว\n` +
-                        `ค่าจัดส่ง: ฟรี 🎉`;
+                        `ค่าจัดส่ง: ฟรี (5 แก้วขึ้นไป) / 15 บาท (น้อยกว่า 5 แก้ว)`;
                 } else {
-                    const label = feeInfo.zone === 'paid15'
-                        ? `ค่าจัดส่ง · ${cupCount} แก้ว · ไม่เกิน 3 กม.`
-                        : `ค่าจัดส่ง · ${cupCount} แก้ว · 3–5 กม.`;
+                    // 3–5 กม.
                     container.innerHTML = `
                         <div class="result-card paid-card">
                             <div class="result-card-icon">🛵</div>
                             <div class="result-card-body">
-                                <div class="result-card-label">${label}</div>
-                                <div class="result-card-value">${feeInfo.fee} บาท</div>
+                                <div class="result-card-label">ค่าจัดส่ง · 3–5 กม.</div>
+                                <div class="result-card-value">30 บาท</div>
                             </div>
                         </div>`;
                     currentResultText =
-                        `📍 location ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
+                        `📍 ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
                         `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                        `จำนวน: ${cupCount} แก้ว\n` +
-                        `ค่าจัดส่ง: ${feeInfo.fee} บาท`;
+                        `ค่าจัดส่ง: 30 บาท`;
                 }
 
                 resultsEl.classList.add('show');
@@ -1275,38 +1264,6 @@
                 searchDropdown.innerHTML = '<div class="search-loading">เกิดข้อผิดพลาด กรุณาลองใหม่</div>';
             }
         }
-
-        // ============================================================
-        // Cup Counter +/-
-        // ============================================================
-        let lastDistKm = null, lastDestLat = null, lastDestLng = null;
-
-        function updateCupDisplay() {
-            const el = document.getElementById('cup-count');
-            el.textContent = cupCount;
-            el.classList.toggle('highlight', cupCount >= 5);
-            document.getElementById('cup-minus').disabled = cupCount <= 1;
-        }
-
-        document.getElementById('cup-plus').addEventListener('click', () => {
-            cupCount++;
-            updateCupDisplay();
-            if (lastDistKm !== null) displayResults(lastDistKm, lastDestLat, lastDestLng);
-        });
-
-        document.getElementById('cup-minus').addEventListener('click', () => {
-            if (cupCount > 1) { cupCount--; updateCupDisplay(); }
-            if (lastDistKm !== null) displayResults(lastDistKm, lastDestLat, lastDestLng);
-        });
-
-        // Override displayResults to cache last values for recalculation
-        const _origDisplay = displayResults;
-        displayResults = function(distKm, lat, lng) {
-            lastDistKm = distKm; lastDestLat = lat; lastDestLng = lng;
-            _origDisplay(distKm, lat, lng);
-        };
-
-        updateCupDisplay();
 
         document.addEventListener('DOMContentLoaded', initMap);
 
