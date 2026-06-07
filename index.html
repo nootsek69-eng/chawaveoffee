@@ -811,11 +811,56 @@
         }
 
         /* ---- Search Box ---- */
+        /* ---- Search (collapsible) ---- */
         .search-wrapper {
-            padding: 0.65rem 0.9rem;
             background: #fff;
             border-bottom: 1px solid var(--accent);
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0.5rem 0.9rem;
+            gap: 0.5rem;
+            overflow: hidden;
+        }
+
+        /* Toggle button (magnifying glass) */
+        .search-toggle-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s, transform 0.2s;
+            z-index: 2;
+        }
+
+        .search-toggle-btn:hover {
+            background: #3e2723;
+            transform: scale(1.08);
+        }
+
+        /* Expandable input row */
+        .search-expand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease;
+        }
+
+        .search-expand.open {
+            width: 100%;
+            opacity: 1;
         }
 
         .search-inner {
@@ -824,9 +869,11 @@
             background: #f5f0ee;
             border: 1.5px solid var(--accent);
             border-radius: 50px;
-            padding: 0.45rem 0.9rem;
+            padding: 0.42rem 0.9rem;
             gap: 8px;
+            flex: 1;
             transition: border-color 0.2s;
+            min-width: 0;
         }
 
         .search-inner:focus-within {
@@ -836,7 +883,7 @@
 
         .search-inner i {
             color: var(--secondary);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             flex-shrink: 0;
         }
 
@@ -848,11 +895,10 @@
             font-family: 'Prompt', sans-serif;
             color: var(--text-main);
             width: 100%;
+            min-width: 0;
         }
 
-        .search-input::placeholder {
-            color: #bbb;
-        }
+        .search-input::placeholder { color: #bbb; }
 
         .search-clear {
             background: none;
@@ -863,9 +909,29 @@
             padding: 0;
             line-height: 1;
             display: none;
+            flex-shrink: 0;
         }
 
         .search-clear.visible { display: block; }
+
+        /* Close X button inside expand row */
+        .search-close-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #efebe9;
+            border: none;
+            color: var(--primary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.15s;
+        }
+
+        .search-close-btn:hover { background: var(--accent); }
 
         .search-dropdown {
             position: absolute;
@@ -945,12 +1011,22 @@
         </div>
 
         <!-- Search Box -->
-        <div class="search-wrapper">
-            <div class="search-inner">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="search-input" class="search-input" placeholder="ค้นหาสถานที่..." autocomplete="off">
-                <button class="search-clear" id="search-clear"><i class="fa-solid fa-xmark"></i></button>
+        <div class="search-wrapper" id="search-wrapper">
+            <!-- expandable input -->
+            <div class="search-expand" id="search-expand">
+                <div class="search-inner">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input" class="search-input" placeholder="ค้นหาสถานที่..." autocomplete="off">
+                    <button class="search-clear" id="search-clear"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <button class="search-close-btn" id="search-close-btn">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
+            <!-- icon button -->
+            <button class="search-toggle-btn" id="search-toggle-btn" title="ค้นหาสถานที่">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
             <div class="search-dropdown" id="search-dropdown"></div>
         </div>
 
@@ -1311,12 +1387,38 @@
         });
 
         // ============================================================
-        // Location Search (Nominatim)
+        // Location Search (Nominatim) — collapsible
         // ============================================================
-        const searchInput   = document.getElementById('search-input');
-        const searchClear   = document.getElementById('search-clear');
+        const searchInput    = document.getElementById('search-input');
+        const searchClear    = document.getElementById('search-clear');
         const searchDropdown = document.getElementById('search-dropdown');
+        const searchExpand   = document.getElementById('search-expand');
+        const searchToggleBtn = document.getElementById('search-toggle-btn');
+        const searchCloseBtn  = document.getElementById('search-close-btn');
         let searchTimer = null;
+
+        function openSearch() {
+            searchExpand.classList.add('open');
+            searchToggleBtn.style.display = 'none';
+            setTimeout(() => searchInput.focus(), 150);
+        }
+
+        function collapseSearch() {
+            searchExpand.classList.remove('open');
+            searchToggleBtn.style.display = '';
+            searchInput.value = '';
+            searchClear.classList.remove('visible');
+            closeDropdown();
+        }
+
+        searchToggleBtn.addEventListener('click', openSearch);
+        searchCloseBtn.addEventListener('click', collapseSearch);
+
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#search-wrapper')) collapseSearch();
+        });
+
 
         searchInput.addEventListener('input', () => {
             const q = searchInput.value.trim();
