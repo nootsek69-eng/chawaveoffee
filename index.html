@@ -1322,17 +1322,24 @@
 
                 const distanceKm = route.distance / 1000;
                 
-                // Draw route line color based on zone
+                // Draw route line color based on distance zones
                 if (routeLine) map.removeLayer(routeLine);
                 
-                const feeInfo = getDeliveryFee(distanceKm, cupCount);
-                const lineColor = feeInfo.zone === 'free'   ? '#2e7d32' :
-                                  feeInfo.zone === 'none'   ? '#c62828' : '#e65100';
+                let lineColor = '#388e3c'; // Green for 0-3 km (Primary Zone)
+                let lineDash = null;
+                
+                if (distanceKm > 5) {
+                    lineColor = '#d32f2f'; // Red for > 5 km (No delivery)
+                    lineDash = '8, 8';     // Dashed line for out of bounds
+                } else if (distanceKm > 3) {
+                    lineColor = '#f57c00'; // Orange for 3-5 km (Paid Zone 30 THB)
+                }
 
                 const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
                 routeLine = L.polyline(coordinates, {
                     color: lineColor,
-                    weight: 5,
+                    weight: distanceKm > 5 ? 4 : 5,
+                    dashArray: lineDash,
                     opacity: 0.85,
                     lineCap: 'round',
                     lineJoin: 'round'
