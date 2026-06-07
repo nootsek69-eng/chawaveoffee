@@ -1262,12 +1262,13 @@
                 maxZoom: 19,
             }).addTo(map);
 
-            // Store icon
+            // Store icon (using logo.jpg)
             const storeIcon = L.divIcon({
-                html: '<i class="fa-solid fa-location-dot fa-3x" style="color: #4e342e; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>',
+                html: '<div style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; border: 3px solid #4e342e; box-shadow: 0 4px 12px rgba(0,0,0,0.4); background-color: #fff;"><img src="logo.jpg" style="width: 100%; height: 100%; object-fit: cover;"></div>',
                 className: 'custom-div-icon',
-                iconSize: [30, 42],
-                iconAnchor: [15, 42]
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+                popupAnchor: [0, -25]
             });
 
             storeMarker = L.marker([STORE_LAT, STORE_LNG], {icon: storeIcon}).addTo(map)
