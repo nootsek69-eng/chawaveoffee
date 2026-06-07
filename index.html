@@ -1273,7 +1273,7 @@
             });
 
             storeMarker = L.marker([STORE_LAT, STORE_LNG], {icon: storeIcon}).addTo(map)
-                .bindPopup('<b style="font-family: Prompt;">Chawave Coffee & Tea</b>').openPopup();
+                .bindPopup('<div style="display:flex; align-items:center; gap:8px;"><img src="logo.jpg" style="width:28px; height:28px; border-radius:50%; object-fit:cover;"> <b style="font-family: Prompt; margin:0;">Chawave Coffee & Tea</b></div>').openPopup();
 
             map.on('click', function(e) {
                 setDestination(e.latlng.lat, e.latlng.lng);
