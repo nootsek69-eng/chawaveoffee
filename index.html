@@ -1177,8 +1177,8 @@
 
         // ============================================================
         // Delivery pricing: 3 tiers only
-        //   0 – 3 km + 5+ cups  → Free
-        //   0 – 3 km < 5 cups   → 15 baht
+        //   0 – 3 km + 4+ cups  → Free
+        //   0 – 3 km < 4 cups   → 15 baht
         //   3 – 5 km            → 30 baht
         //   > 5 km              → Outside service area (null)
         // ============================================================
@@ -1188,7 +1188,7 @@
             if (distanceKm > 5)  return { fee: null,  zone: 'none', label: 'นอกพื้นที่บริการ' };
             if (distanceKm > 3)  return { fee: 30,    zone: 'paid', label: '30 บาท' };
             // within 3 km
-            if (cups >= 5)       return { fee: 0,     zone: 'free', label: 'ส่งฟรี! 🎉' };
+            if (cups >= 4)       return { fee: 0,     zone: 'free', label: 'ส่งฟรี! 🎉' };
             return                        { fee: 15,   zone: 'paid15', label: '15 บาท' };
         }
 
@@ -1319,21 +1319,21 @@
                         <div class="result-card free-card">
                             <div class="result-card-icon">🎉</div>
                             <div class="result-card-body">
-                                <div class="result-card-label">5 แก้วขึ้นไป · ไม่เกิน 3 กม.</div>
+                                <div class="result-card-label">4 แก้วขึ้นไป · ไม่เกิน 3 กม.</div>
                                 <div class="result-card-value">ส่งฟรี!</div>
                             </div>
                         </div>
                         <div class="result-card paid-card" style="margin-top:0.5rem;">
                             <div class="result-card-icon">🛵</div>
                             <div class="result-card-body">
-                                <div class="result-card-label">น้อยกว่า 5 แก้ว · ไม่เกิน 3 กม.</div>
+                                <div class="result-card-label">น้อยกว่า 4 แก้ว · ไม่เกิน 3 กม.</div>
                                 <div class="result-card-value">15 บาท</div>
                             </div>
                         </div>`;
                     currentResultText =
                         `📍 ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
                         `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                        `ค่าจัดส่ง: ฟรี (5 แก้วขึ้นไป) / 15 บาท (น้อยกว่า 5 แก้ว)`;
+                        `ค่าจัดส่ง: ฟรี (4 แก้วขึ้นไป) / 15 บาท (น้อยกว่า 4 แก้ว)`;
                 } else {
                     // 3–5 กม.
                     container.innerHTML = `
