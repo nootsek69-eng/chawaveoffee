@@ -393,6 +393,41 @@
             z-index: 1;
         }
 
+        /* Actions & Toggle */
+        .toggle-actions-btn {
+            background: #fdfbfb;
+            color: var(--primary);
+            text-align: center;
+            padding: 0.6rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-bottom: 1px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .toggle-actions-btn:hover {
+            background: #f5f0ee;
+        }
+
+        .actions-wrapper {
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            overflow: hidden;
+            max-height: 1200px;
+            opacity: 1;
+        }
+
+        .actions-wrapper.collapsed {
+            max-height: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
         .actions {
             padding: 1.5rem;
             display: flex;
@@ -1012,8 +1047,14 @@
                 </div>
             </div>
 
-            <div class="actions">
-                <button class="btn" id="btn-current-location">
+            <div class="toggle-actions-btn" id="toggle-actions-btn">
+                <span>ซ่อนรายละเอียด</span>
+                <i class="fa-solid fa-chevron-up"></i>
+            </div>
+
+            <div class="actions-wrapper" id="actions-wrapper">
+                <div class="actions">
+                    <button class="btn" id="btn-current-location">
                     <i class="fa-solid fa-location-crosshairs"></i> ใช้ตำแหน่งปัจจุบันของฉัน
                 </button>
 
@@ -1046,6 +1087,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
         <div class="map-wrapper" style="position: relative; display: flex; flex-direction: column; flex: 1 1 auto; min-height: 250px;">
             <!-- Search Box Overlay -->
@@ -1171,6 +1213,26 @@
     <script>
         const STORE_LAT = 14.658529359926023;
         const STORE_LNG = 104.22206111928476;
+
+        // ============================================================
+        // Panel Toggle Logic
+        // ============================================================
+        const toggleActionsBtn = document.getElementById('toggle-actions-btn');
+        const actionsWrapper   = document.getElementById('actions-wrapper');
+        toggleActionsBtn.addEventListener('click', () => {
+            actionsWrapper.classList.toggle('collapsed');
+            const icon = toggleActionsBtn.querySelector('i');
+            const span = toggleActionsBtn.querySelector('span');
+            if (actionsWrapper.classList.contains('collapsed')) {
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+                span.innerText = 'แสดงรายละเอียด';
+            } else {
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+                span.innerText = 'ซ่อนรายละเอียด';
+            }
+        });
 
         // ============================================================
         // Delivery pricing: 3 tiers only
