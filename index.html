@@ -1306,7 +1306,7 @@
                     `ระยะทางของคุณ: ${distFormatted} กม. (เกิน 5 กม.)`;
                 noDeliveryEl.classList.add('show');
                 currentResultText =
-                    `📍 ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
+                    `📍 ปลายทาง: https://maps.google.com/?q=${destLat.toFixed(6)},${destLng.toFixed(6)}\n` +
                     `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
                     `ค่าจัดส่ง: นอกพื้นที่บริการ`;
             } else {
@@ -1331,7 +1331,7 @@
                             </div>
                         </div>`;
                     currentResultText =
-                        `📍 ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
+                        `📍 ปลายทาง: https://maps.google.com/?q=${destLat.toFixed(6)},${destLng.toFixed(6)}\n` +
                         `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
                         `ค่าจัดส่ง: ฟรี (4 แก้วขึ้นไป) / 15 บาท (น้อยกว่า 4 แก้ว)`;
                 } else {
@@ -1345,7 +1345,7 @@
                             </div>
                         </div>`;
                     currentResultText =
-                        `📍 ปลายทาง: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}\n` +
+                        `📍 ปลายทาง: https://maps.google.com/?q=${destLat.toFixed(6)},${destLng.toFixed(6)}\n` +
                         `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
                         `ค่าจัดส่ง: 30 บาท`;
                 }
