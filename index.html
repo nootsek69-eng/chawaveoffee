@@ -47,12 +47,33 @@
         .container {
             width: 100%;
             max-width: none;
-            background: var(--surface);
-            border-radius: 0;
-            box-shadow: none;
+            background: var(--background);
+            display: flex;
+            flex-direction: row;
+            min-height: 100dvh;
+        }
+
+        .sidebar {
+            width: 380px;
             display: flex;
             flex-direction: column;
-            min-height: 100dvh;
+            background: var(--surface);
+            z-index: 2;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                box-shadow: none;
+                overflow-y: visible;
+                flex-shrink: 1;
+            }
         }
 
         .header {
@@ -976,17 +997,53 @@
 <body>
 
     <div class="container">
-        <div class="header">
-            <div class="header-left">
-                <h1>Chawave Coffee &amp; Tea</h1>
-                <button class="btn-info" id="btn-info" title="ข้อมูลร้านและค่าบริการ">
-                    <i class="fa-solid fa-circle-info"></i>
-                </button>
+        <div class="sidebar">
+            <div class="header">
+                <div class="header-left">
+                    <h1>Chawave Coffee &amp; Tea</h1>
+                    <button class="btn-info" id="btn-info" title="ข้อมูลร้านและค่าบริการ">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </button>
+                </div>
+                <div class="header-line-btn">
+                    <a href="https://lin.ee/yIiZqZ9" target="_blank">
+                        <img src="https://scdn.line-apps.com/n/line_add_friends/btn/th.png" alt="เพิ่มเพื่อน" height="32" border="0">
+                    </a>
+                </div>
             </div>
-            <div class="header-line-btn">
-                <a href="https://lin.ee/yIiZqZ9" target="_blank">
-                    <img src="https://scdn.line-apps.com/n/line_add_friends/btn/th.png" alt="เพิ่มเพื่อน" height="32" border="0">
-                </a>
+
+            <div class="actions">
+                <button class="btn" id="btn-current-location">
+                    <i class="fa-solid fa-location-crosshairs"></i> ใช้ตำแหน่งปัจจุบันของฉัน
+                </button>
+
+                <div id="loading" class="loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i> กำลังคำนวณระยะทางและเส้นทาง...
+                </div>
+                
+                <div id="error" class="error-message"></div>
+
+                <div id="results" class="results">
+                    <!-- Distance row -->
+                    <div class="result-row">
+                        <span class="result-label"><i class="fa-solid fa-route"></i> ระยะทาง</span>
+                        <span class="result-value" id="res-distance">0.00 กม.</span>
+                    </div>
+
+                    <!-- Fee card (injected dynamically) -->
+                    <div id="fee-card-container"></div>
+
+                    <button class="btn btn-outline" style="width: 100%; margin-top: 0.75rem;" id="btn-copy">
+                        <i class="fa-regular fa-copy"></i> คัดลอกผลลัพธ์
+                    </button>
+                </div>
+
+                <div id="no-delivery" class="no-delivery">
+                    <div class="no-delivery-icon">🛵❌</div>
+                    <p class="nd-title">นอกพื้นที่บริการจัดส่ง</p>
+                    <p class="nd-dist" id="no-delivery-dist"></p>
+                    <span class="nd-hint">กรุณาติดต่อร้านโดยตรงเพื่อสอบถามเพิ่มเติม</span>
+                </div>
             </div>
         </div>
 
@@ -1013,42 +1070,8 @@
 
             <div id="map" class="map-container" style="flex: 1 1 auto; height: 100%; min-height: 250px;"></div>
         </div>
-
-        <div class="actions">
-            <button class="btn" id="btn-current-location">
-                <i class="fa-solid fa-location-crosshairs"></i> ใช้ตำแหน่งปัจจุบันของฉัน
-            </button>
-
-
-            <div id="loading" class="loading">
-                <i class="fa-solid fa-spinner fa-spin"></i> กำลังคำนวณระยะทางและเส้นทาง...
-            </div>
-            
-            <div id="error" class="error-message"></div>
-
-            <div id="results" class="results">
-                <!-- Distance row -->
-                <div class="result-row">
-                    <span class="result-label"><i class="fa-solid fa-route"></i> ระยะทาง</span>
-                    <span class="result-value" id="res-distance">0.00 กม.</span>
-                </div>
-
-                <!-- Fee card (injected dynamically) -->
-                <div id="fee-card-container"></div>
-
-                <button class="btn btn-outline" style="width: 100%; margin-top: 0.75rem;" id="btn-copy">
-                    <i class="fa-regular fa-copy"></i> คัดลอกผลลัพธ์
-                </button>
-            </div>
-
-            <div id="no-delivery" class="no-delivery">
-                <div class="no-delivery-icon">🛵❌</div>
-                <p class="nd-title">นอกพื้นที่บริการจัดส่ง</p>
-                <p class="nd-dist" id="no-delivery-dist"></p>
-                <span class="nd-hint">กรุณาติดต่อร้านโดยตรงเพื่อสอบถามเพิ่มเติม</span>
-            </div>
-        </div>
     </div>
+
 
     <div id="toast" class="toast"><i class="fa-solid fa-check-circle"></i> คัดลอกผลลัพธ์สำเร็จ</div>
 
