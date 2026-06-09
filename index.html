@@ -1167,7 +1167,7 @@
                         <div class="zone-card free-zone">
                             <div class="zone-card-icon">🆓</div>
                             <div class="zone-card-info">
-                                <div class="zone-card-range">ไม่เกิน 3 กิโลเมตร<br><small style="font-size: 0.75rem; color: #2e7d32;">*4 แก้วขึ้นไป หรือยอดเกิน 200 บาท</small></div>
+                                <div class="zone-card-range">ไม่เกิน 3 กิโลเมตร</div>
                                 <div class="zone-card-fee">ส่งฟรี! 🎉</div>
                             </div>
                         </div>
@@ -1175,7 +1175,7 @@
                             <div class="zone-card-icon">🛵</div>
                             <div class="zone-card-info">
                                 <div class="zone-card-range">3 – 5 กิโลเมตร</div>
-                                <div class="zone-card-fee">30 บาท</div>
+                                <div class="zone-card-fee">15 บาท</div>
                             </div>
                         </div>
                         <div class="zone-card none-zone">
@@ -1236,20 +1236,18 @@
         });
 
         // ============================================================
-        // Delivery pricing: 3 tiers only
-        //   0 – 3 km + 4+ cups  → Free
-        //   0 – 3 km < 4 cups   → 15 baht
-        //   3 – 5 km            → 30 baht
+        // Delivery pricing:
+        //   0 – 3 km            → Free
+        //   3 – 5 km            → 15 baht
         //   > 5 km              → Outside service area (null)
         // ============================================================
         let cupCount = 1;
 
         function getDeliveryFee(distanceKm, cups) {
             if (distanceKm > 5)  return { fee: null,  zone: 'none', label: 'นอกพื้นที่บริการ' };
-            if (distanceKm > 3)  return { fee: 30,    zone: 'paid', label: '30 บาท' };
+            if (distanceKm > 3)  return { fee: 15,    zone: 'paid', label: '15 บาท' };
             // within 3 km
-            if (cups >= 4)       return { fee: 0,     zone: 'free', label: 'ส่งฟรี! 🎉' };
-            return                        { fee: 15,   zone: 'paid15', label: '15 บาท' };
+            return { fee: 0,     zone: 'free', label: 'ส่งฟรี! 🎉' };
         }
 
         let map, storeMarker, destMarker, routeLine;
@@ -1334,7 +1332,7 @@
                     lineColor = '#d32f2f'; // Red for > 5 km (No delivery)
                     lineDash = '8, 8';     // Dashed line for out of bounds
                 } else if (distanceKm > 3) {
-                    lineColor = '#1976d2'; // Blue for 3-5 km (Paid Zone 30 THB)
+                    lineColor = '#1976d2'; // Blue for 3-5 km (Paid Zone 15 THB)
                 }
 
                 const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
@@ -1382,26 +1380,19 @@
                 const container = document.getElementById('fee-card-container');
 
                 if (distanceKm <= 3) {
-                    // โซนใกล้ — แสดง 2 กรณี
+                    // โซนใกล้
                     container.innerHTML = `
                         <div class="result-card free-card">
                             <div class="result-card-icon">🎉</div>
                             <div class="result-card-body">
-                                <div class="result-card-label">4 แก้วขึ้นไป หรือยอดเกิน 200 บาท · ไม่เกิน 3 กม.</div>
+                                <div class="result-card-label">ค่าจัดส่ง · ไม่เกิน 3 กม.</div>
                                 <div class="result-card-value">ส่งฟรี!</div>
-                            </div>
-                        </div>
-                        <div class="result-card paid-card" style="margin-top:0.5rem;">
-                            <div class="result-card-icon">🛵</div>
-                            <div class="result-card-body">
-                                <div class="result-card-label">น้อยกว่า 4 แก้ว และยอดไม่ถึง 200 บาท · ไม่เกิน 3 กม.</div>
-                                <div class="result-card-value">15 บาท</div>
                             </div>
                         </div>`;
                     currentResultText =
                         `📍 ปลายทาง: https://maps.google.com/?q=${destLat.toFixed(6)},${destLng.toFixed(6)}\n` +
                         `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                        `ค่าจัดส่ง: ฟรี (4 แก้วขึ้นไป / ยอดเกิน 200 บาท) / 15 บาท (ไม่ถึงเงื่อนไข)`;
+                        `ค่าจัดส่ง: ฟรี`;
                 } else {
                     // 3–5 กม.
                     container.innerHTML = `
@@ -1409,13 +1400,13 @@
                             <div class="result-card-icon">🛵</div>
                             <div class="result-card-body">
                                 <div class="result-card-label">ค่าจัดส่ง · 3–5 กม.</div>
-                                <div class="result-card-value">30 บาท</div>
+                                <div class="result-card-value">15 บาท</div>
                             </div>
                         </div>`;
                     currentResultText =
                         `📍 ปลายทาง: https://maps.google.com/?q=${destLat.toFixed(6)},${destLng.toFixed(6)}\n` +
                         `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                        `ค่าจัดส่ง: 30 บาท`;
+                        `ค่าจัดส่ง: 15 บาท`;
                 }
 
                 resultsEl.classList.add('show');
