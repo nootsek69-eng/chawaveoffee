@@ -1055,20 +1055,9 @@
 
             <div class="actions-wrapper" id="actions-wrapper">
                 <div class="actions">
-                    <button class="btn" id="btn-current-location" style="margin-bottom: 0.5rem;">
+                    <button class="btn" id="btn-current-location">
                         <i class="fa-solid fa-location-crosshairs"></i> ใช้ตำแหน่งปัจจุบันของฉัน
                     </button>
-                    
-                    <div class="cup-row" style="margin-bottom: 0.5rem;">
-                        <div class="cup-label">
-                            <i class="fa-solid fa-mug-hot"></i> จำนวนแก้ว
-                        </div>
-                        <div class="cup-counter">
-                            <button class="cup-btn" id="btn-minus" disabled><i class="fa-solid fa-minus"></i></button>
-                            <span class="cup-num" id="cup-num">1</span>
-                            <button class="cup-btn" id="btn-plus"><i class="fa-solid fa-plus"></i></button>
-                        </div>
-                    </div>
 
                 <div id="loading" class="loading">
                     <i class="fa-solid fa-spinner fa-spin"></i> กำลังคำนวณระยะทางและเส้นทาง...
@@ -1252,38 +1241,8 @@
         //   3 – 5 km            → 15 baht
         //   > 5 km              → Outside service area (null)
         // ============================================================
-        let cupCount = 1;
-        let currentDistanceKm = 0;
-        let currentDestLat = 0;
-        let currentDestLng = 0;
-
         let map, storeMarker, destMarker, routeLine;
         let currentResultText = '';
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const btnMinus = document.getElementById('btn-minus');
-            const btnPlus = document.getElementById('btn-plus');
-            const cupNum = document.getElementById('cup-num');
-
-            if(btnMinus && btnPlus && cupNum) {
-                btnMinus.addEventListener('click', () => { updateCupCount(-1); });
-                btnPlus.addEventListener('click', () => { updateCupCount(1); });
-            }
-
-            function updateCupCount(delta) {
-                cupCount += delta;
-                if (cupCount < 1) cupCount = 1;
-                cupNum.innerText = cupCount;
-                btnMinus.disabled = cupCount <= 1;
-                
-                if (cupCount >= 2) cupNum.classList.add('highlight');
-                else cupNum.classList.remove('highlight');
-                
-                if (destMarker && currentDistanceKm > 0) {
-                    displayResults(currentDistanceKm, currentDestLat, currentDestLng);
-                }
-            }
-        });
 
         function initMap() {
             map = L.map('map').setView([STORE_LAT, STORE_LNG], 14);
@@ -1353,9 +1312,6 @@
                 , data.routes[0]);
 
                 const distanceKm = route.distance / 1000;
-                currentDistanceKm = distanceKm;
-                currentDestLat = destLat;
-                currentDestLng = destLng;
                 
                 // Draw route line color based on distance zones
                 if (routeLine) map.removeLayer(routeLine);
@@ -1409,42 +1365,31 @@
                 currentResultText =
                     `📍 ปลายทาง: https://maps.google.com/?q=${destLat.toFixed(6)},${destLng.toFixed(6)}\n` +
                     `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                    `จำนวน: ${cupCount} แก้ว\n` +
                     `ค่าจัดส่ง: นอกพื้นที่บริการ`;
             } else {
                 document.getElementById('res-distance').innerText = `${distFormatted} กม.`;
                 const container = document.getElementById('fee-card-container');
 
                 if (distanceKm <= 3) {
-                    if (cupCount >= 2) {
-                        container.innerHTML = `
-                            <div class="result-card free-card">
-                                <div class="result-card-icon">🎉</div>
-                                <div class="result-card-body">
-                                    <div class="result-card-label">2 แก้วขึ้นไป · ไม่เกิน 3 กม.</div>
-                                    <div class="result-card-value">ส่งฟรี!</div>
-                                </div>
-                            </div>`;
-                        currentResultText =
-                            `📍 ปลายทาง: https://maps.google.com/?q=${destLat.toFixed(6)},${destLng.toFixed(6)}\n` +
-                            `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                            `จำนวน: ${cupCount} แก้ว\n` +
-                            `ค่าจัดส่ง: ฟรี`;
-                    } else {
-                        container.innerHTML = `
-                            <div class="result-card paid-card">
-                                <div class="result-card-icon">🛵</div>
-                                <div class="result-card-body">
-                                    <div class="result-card-label">น้อยกว่า 2 แก้ว · ไม่เกิน 3 กม.</div>
-                                    <div class="result-card-value">15 บาท</div>
-                                </div>
-                            </div>`;
-                        currentResultText =
-                            `📍 ปลายทาง: https://maps.google.com/?q=${destLat.toFixed(6)},${destLng.toFixed(6)}\n` +
-                            `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                            `จำนวน: ${cupCount} แก้ว\n` +
-                            `ค่าจัดส่ง: 15 บาท`;
-                    }
+                    container.innerHTML = `
+                        <div class="result-card free-card">
+                            <div class="result-card-icon">🎉</div>
+                            <div class="result-card-body">
+                                <div class="result-card-label">2 แก้วขึ้นไป · ไม่เกิน 3 กม.</div>
+                                <div class="result-card-value">ส่งฟรี!</div>
+                            </div>
+                        </div>
+                        <div class="result-card paid-card" style="margin-top:0.5rem;">
+                            <div class="result-card-icon">🛵</div>
+                            <div class="result-card-body">
+                                <div class="result-card-label">1 แก้ว · ไม่เกิน 3 กม.</div>
+                                <div class="result-card-value">15 บาท</div>
+                            </div>
+                        </div>`;
+                    currentResultText =
+                        `📍 ปลายทาง: https://maps.google.com/?q=${destLat.toFixed(6)},${destLng.toFixed(6)}\n` +
+                        `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
+                        `ค่าจัดส่ง: ฟรี (2 แก้วขึ้นไป) / 15 บาท (1 แก้ว)`;
                 } else {
                     // 3–5 กม.
                     container.innerHTML = `
@@ -1458,7 +1403,6 @@
                     currentResultText =
                         `📍 ปลายทาง: https://maps.google.com/?q=${destLat.toFixed(6)},${destLng.toFixed(6)}\n` +
                         `ระยะทาง: ${distFormatted} กิโลเมตร\n` +
-                        `จำนวน: ${cupCount} แก้ว\n` +
                         `ค่าจัดส่ง: 15 บาท`;
                 }
 
